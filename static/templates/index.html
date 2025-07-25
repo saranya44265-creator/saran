@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pomodoro Timer</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #fefae0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative;
+    }
+    .side-heading {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      font-weight: bold;
+      font-size: 1em;
+      color: #003049;
+    }
+    .card {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      width: 360px;
+      transition: background-color 0.5s;
+    }
+    .card.break-mode {
+      background-color: #cdeac0;
+    }
+    h1 {
+      color: #d62828;
+      margin-bottom: 10px;
+    }
+    .message {
+      font-size: 1.2em;
+      margin: 10px 0;
+      color: #003049;
+    }
+    input {
+      padding: 8px;
+      width: 60px;
+      font-size: 1em;
+      margin: 10px;
+    }
+    #timer {
+      font-size: 3em;
+      color: #003049;
+      margin: 15px 0;
+    }
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #start { background-color: #f77f00; color: white; }
+    #reset { background-color: #003049; color: white; }
+  </style>
+</head>
+<body>
+  <div class="side-heading">🌿 Pomodoro Session</div>
+  <div class="card" id="card">
+    <h1>⏰Pomodoro Timer⏰</h1>
+    <div class="message" id="message">Ready to work!</div>
+    <label>Work Time (min): <input type="number" id="workInput" value="25" min="1" /></label><br/>
+    <label>Break Time (min): <input type="number" id="breakInput" value="5" min="1" /></label>
+    <div id="timer">25:00</div>
+    <button id="start">Start</button>
+    <button id="reset">Reset</button>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('start');
+    const resetBtn = document.getElementById('reset');
+    const timerDisplay = document.getElementById('timer');
+    const workInput = document.getElementById('workInput');
+    const breakInput = document.getElementById('breakInput');
+    const card = document.getElementById('card');
+    const message = document.getElementById('message');
+
+    let timer;
+    let timeLeft;
+    let running = false;
+    let isBreak = false;
+
+    function updateDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+      if (!running) {
+        running = true;
+        isBreak = false;
+        card.classList.remove('break-mode');
+        message.textContent = "You're doing great! 💼";
+        timeLeft = parseInt(workInput.value) * 60;
+        updateDisplay();
+        timer = setInterval(runTimer, 1000);
+      }
+    }
+
+    function runTimer() {
+      timeLeft--;
+      updateDisplay();
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        if (!isBreak) {
+          alert("Work session complete! Have some break 😊");
+          isBreak = true;
+          card.classList.add('break-mode');
+          message.textContent = "Have some break 😊";
+          timeLeft = parseInt(breakInput.value) * 60;
+          timer = setInterval(runTimer, 1000);
+        } else {
+          alert("Break finished! Come on! It’s time to work! 💪");
+          running = false;
+          card.classList.remove('break-mode');
+          message.textContent = "Ready to work!";
+        }
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      running = false;
+      isBreak = false;
+      card.classList.remove('break-mode');
+      message.textContent = "Ready to work!";
+      timeLeft = parseInt(workInput.value) * 60;
+      updateDisplay();
+    }
+
+    workInput.addEventListener('change', () => {
+      if (!running) {
+        timeLeft = parseInt(workInput.value) * 60;
+        updateDisplay();
+      }
+    });
+
+    startBtn.addEventListener('click', startTimer);
+    resetBtn.addEventListener('click', resetTimer);
+
+    timeLeft = parseInt(workInput.value) * 60;
+    updateDisplay();
+  </script>
+</body>
+</html>
